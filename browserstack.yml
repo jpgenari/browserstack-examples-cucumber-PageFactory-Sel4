@@ -31,11 +31,11 @@ platforms:
   - os: OS X
     osVersion: Big Sur
     browserName: Chrome
-    browserVersion: latest
+    browserVersion: 131.0
   - os: Windows
     osVersion: 10
     browserName: Edge
-    browserVersion: latest
+    browserVersion: 131.0
   - deviceName: Samsung Galaxy S2*
     browserName: chrome # Try 'samsung' for Samsung browser
     osVersion: [12131415]
