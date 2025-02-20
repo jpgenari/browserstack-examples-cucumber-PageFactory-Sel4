@@ -33,3 +33,7 @@ build/
 *.iml
 .DS_Store
 !gradle/wrapper/*
+logs/key-metrics.json
+logs/key-metrics.json
+src/test/java/StepDefinitions/CartSteps.ignorejava
+src/test/resources/Features/Cart.ignorefeature

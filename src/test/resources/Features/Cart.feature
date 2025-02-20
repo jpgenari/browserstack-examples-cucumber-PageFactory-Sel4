@@ -2,7 +2,7 @@
 #Date: 02/21/2025
 #Description: Adding Cart management related tests to the suite
 @e2e @regression @cart
-Feature: E2E Flow
+Feature: Cart Management Flow
   Scenario Outline: TC-1931 Add item to cart and verify UI updates accordingly
     Given User is on home page
     When User clicks on <product> Add To Cart button <quantity> times

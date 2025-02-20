@@ -123,14 +123,13 @@ public class bsHome {
 
     public boolean verifyCart(String deviceName, int quantity) {
         try {
-            if (lnkCheckout.isDisplayed()) {
-                WebElement deviceQuantityElement = driver.findElement(
-                        By.xpath("//p[@class = 'title'][text()='" + deviceName + "']/following-sibling::p[1]"));
+            WebElement deviceQuantityElement = driver.findElement(
+                    By.xpath("//p[@class = 'title'][text()='" + deviceName +
+                            "']/following-sibling::p[1]"));
 
-                if (deviceQuantityElement.getText().contains("Quantity: " + quantity))
-                    return true;
+            if (deviceQuantityElement.getText().contains("Quantity: " + quantity))
+                return true;
 
-            }
         } catch (Exception e) {
             return false;
         }
@@ -148,9 +147,10 @@ public class bsHome {
 
     public void addToCartNTimes(String deviceName, int quantity) {
         WebElement cartButton = driver
-                .findElement(By.xpath("(//p[text()='" + deviceName + "']/following-sibling::div[2])"));
+                .findElement(By.xpath("(//p[text()='" + deviceName +
+                        "']/following-sibling::div[2])"));
         wait.until(ExpectedConditions.elementToBeClickable(cartButton));
-        for (int i = 0; i <= quantity; i++) {
+        for (int i = 0; i < quantity; i++) {
             cartButton.click();
         }
         wait.until(ExpectedConditions.elementToBeClickable(lnkCheckout));

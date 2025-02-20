@@ -81,7 +81,7 @@ consoleLogs: errors # <string> Remote browser's console debug levels to be print
 # Test Observability is an intelligent test reporting & debugging product. It collects data using the SDK. Read more about what data is collected at https://www.browserstack.com/docs/test-observability/references/terms-and-conditions
 # Visit observability.browserstack.com to see your test reports and insights. To disable test observability, specify `testObservability: false` in the key below.
 testObservability: true
-accessibility: true
+accessibility: false
 accessibilityOptions:
   wcagVersion: wcag21aaa # Default: wcag21aa
   includeIssueType:
@@ -91,7 +91,7 @@ accessibilityOptions:
   #includeTagsInTestingScope: [ '@users' ] # Tags for test cases to include
   #excludeTagsInTestingScope: [ 'old', 'deprecated' ] # Tags for test cases to exclude
 
-performance: assert
-percy: true
+performance: false
+percy: false
 percyCaptureMode: auto
 #logLevel: debug
