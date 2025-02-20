@@ -16,63 +16,70 @@ public class bsHome {
 
     WebDriver driver;
     WebDriverWait wait;
-    @FindBy(how = How.XPATH, using="//span[text()='Apple']")
-    WebElement lblApple ;
-    @FindBy(xpath="//select")
-    WebElement ddPrice ;
-    @FindBy(id="signin")
+    @FindBy(how = How.XPATH, using = "//span[text()='Apple']")
+    WebElement lblApple;
+    @FindBy(xpath = "//select")
+    WebElement ddPrice;
+    @FindBy(id = "signin")
     WebElement lnksignIn;
-    @FindBy(xpath="//div[text()='Checkout']")
+    @FindBy(xpath = "//div[text()='Checkout']")
     WebElement lnkCheckout;
     @FindBy(id = "offers")
     WebElement lnkOffers;
-    @FindBy(id="logout")
+    @FindBy(id = "logout")
     WebElement lnkLogout;
     @FindBy(xpath = "(//div[@class='shelf-item__thumb']/img)[1]")
     WebElement image;
-    @FindBy(id="orders")
+    @FindBy(id = "orders")
     WebElement lnkOrder;
 
-    public bsHome(WebDriver driver){
+    public bsHome(WebDriver driver) {
         this.driver = driver;
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        PageFactory.initElements(driver,this);
+        PageFactory.initElements(driver, this);
     }
-    public void searchProduct(){
+
+    public void searchProduct() {
         lblApple.click();
     }
+
     public void sortResult() throws InterruptedException {
         Select sort = new Select(ddPrice);
         sort.selectByValue("lowestprice");
         Thread.sleep(5000);
 
     }
-    public Map<String, String> searchResult(){
+
+    public Map<String, String> searchResult() {
         List<WebElement> iphones = driver.findElements(By.cssSelector("div.shelf-item"));
-        Assert.assertEquals("9 products not shown as expected",9,iphones.size());
-        String title,price;
-        Map<String,String> iphoneDetails= new HashMap<String,String>();
-        for (int i = 0;i<iphones.size()-1;i++){
+        Assert.assertEquals("9 products not shown as expected", 9, iphones.size());
+        String title, price;
+        Map<String, String> iphoneDetails = new HashMap<String, String>();
+        for (int i = 0; i < iphones.size() - 1; i++) {
             title = iphones.get(i).findElement(By.xpath(".//p[@class='shelf-item__title']")).getAttribute("innerText");
             price = iphones.get(i).findElement(By.xpath(".//div[@class='val']/b")).getText();
-            iphoneDetails.put(title,price);
+            iphoneDetails.put(title, price);
         }
         return iphoneDetails;
     }
-    public void openOffers(){
-        wait.until(ExpectedConditions.elementToBeClickable(lnkOffers));
-        ((JavascriptExecutor)driver).executeScript("window.navigator.geolocation.getCurrentPosition=function(success){"+
-                "var position = {\"coords\" : {\"latitude\": \"19.075984\",\"longitude\": \"72.877656\"}};"+
-                "success(position);}");  //Sets location of Browser to Mumbai
 
-        /*System.out.println(((JavascriptExecutor) driver).executeScript("var positionStr=\"\";"+
-                "window.navigator.geolocation.getCurrentPosition(function(pos){positionStr=pos.coords.latitude+\":\"+pos.coords.longitude});"+
-                "return positionStr;"));*/
+    public void openOffers() {
+        wait.until(ExpectedConditions.elementToBeClickable(lnkOffers));
+        ((JavascriptExecutor) driver)
+                .executeScript("window.navigator.geolocation.getCurrentPosition=function(success){" +
+                        "var position = {\"coords\" : {\"latitude\": \"19.075984\",\"longitude\": \"72.877656\"}};" +
+                        "success(position);}"); // Sets location of Browser to Mumbai
+
+        /*
+         * System.out.println(((JavascriptExecutor)
+         * driver).executeScript("var positionStr=\"\";"+
+         * "window.navigator.geolocation.getCurrentPosition(function(pos){positionStr=pos.coords.latitude+\":\"+pos.coords.longitude});"+
+         * "return positionStr;"));
+         */
         lnkOffers.click();
     }
 
-
-    public void userSignIn(){
+    public void userSignIn() {
         wait.until(ExpectedConditions.elementToBeClickable(lnksignIn));
         lnksignIn.click();
     }
@@ -84,26 +91,27 @@ public class bsHome {
                     .ignoring(Exception.class)
                     .withTimeout(Duration.ofSeconds(10));
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span.username")));
-        }catch(Exception e){
+        } catch (Exception e) {
             return false;
         }
         return true;
     }
 
-    public void verifyandlogout(){
+    public void verifyandlogout() {
         try {
             if (lnkLogout.isDisplayed())
                 lnkLogout.click();
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
 
-    public boolean verifyimageLoaded(){
+    public boolean verifyimageLoaded() {
         Object result = ((JavascriptExecutor) driver).executeScript(
-                "return arguments[0].complete && "+
-                        "typeof arguments[0].naturalWidth != \"undefined\" && "+
-                        "arguments[0].naturalWidth > 0", image);
+                "return arguments[0].complete && " +
+                        "typeof arguments[0].naturalWidth != \"undefined\" && " +
+                        "arguments[0].naturalWidth > 0",
+                image);
 
         boolean loaded = false;
         if (result instanceof Boolean) {
@@ -113,14 +121,42 @@ public class bsHome {
         return loaded;
     }
 
-    public void AddtoCart(){
+    public boolean verifyCart(String deviceName, int quantity) {
+        try {
+            if (lnkCheckout.isDisplayed()) {
+                WebElement deviceQuantityElement = driver.findElement(
+                        By.xpath("//p[@class = 'title'][text()='" + deviceName + "']/following-sibling::p[1]"));
+
+                if (deviceQuantityElement.getText().contains("Quantity: " + quantity))
+                    return true;
+
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public void AddtoCart() {
         WebElement cart = driver.findElement(By.xpath("(//div[text()='Add to cart'])[1]"));
         wait.until(ExpectedConditions.elementToBeClickable(cart));
         cart.click();
         wait.until(ExpectedConditions.elementToBeClickable(lnkCheckout));
         lnkCheckout.click();
     }
-    public void NavigatetoOrder(){
+
+    public void addToCartNTimes(String deviceName, int quantity) {
+        WebElement cartButton = driver
+                .findElement(By.xpath("(//p[text()='" + deviceName + "']/following-sibling::div[2])"));
+        wait.until(ExpectedConditions.elementToBeClickable(cartButton));
+        for (int i = 0; i <= quantity; i++) {
+            cartButton.click();
+        }
+        wait.until(ExpectedConditions.elementToBeClickable(lnkCheckout));
+    }
+
+    public void NavigatetoOrder() {
         wait.until(ExpectedConditions.elementToBeClickable(lnkOrder));
         lnkOrder.click();
     }
