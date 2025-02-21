@@ -8,7 +8,7 @@ Feature: Different Users use cases in BStackDemo
     When User clicks on sign in link
 
  @noimage @fail
- Scenario Outline: TC-1665 Login as User with no image loaded
+ Scenario Outline: TC-1992 Login as User with no image loaded
    When User enters <username> and <password> and clicks on sign in
    And <username> is signed in to the App
    Then Product images are not loaded for the <username>
@@ -17,7 +17,7 @@ Feature: Different Users use cases in BStackDemo
      |"image_not_loading_user"|"testingisfun99"|
 
   @orders
-  Scenario Outline: TC-1666 Login as existing user to verify orders
+  Scenario Outline: TC-1993 Login as existing user to verify orders
      When User enters <username> and <password> and clicks on sign in
      And <username> is signed in to the App
      And User clicks on Orders
@@ -27,9 +27,17 @@ Feature: Different Users use cases in BStackDemo
        |"existing_orders_user"|"testingisfun99"|
 
   @locked
-  Scenario Outline: TC-1667 Login as a locked User
+  Scenario Outline: TC-1994 Login as a locked User
       When User enters <username> and <password> and clicks on sign in
       Then <username> gets Your account has been locked.
       Examples:
         | username | password |
         |"locked_user"|"testingisfun99"|
+
+  @login
+  Scenario Outline: TC-10015 Regular Login
+      When User enters <username> and <password> and clicks on sign in
+      Then <username> is signed in to the App
+      Examples:
+        | username | password |
+        |"demouser"|"testingisfun99"|

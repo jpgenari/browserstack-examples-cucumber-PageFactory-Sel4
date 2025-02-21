@@ -13,14 +13,15 @@ accessKey: YOUR_ACCESS_KEY
 # Set 'projectName' to the name of your project. Example, Marketing Website
 projectName: Bstack Demo Website
 # Set `buildName` as the name of the job / testsuite being run
-buildName: Functional Tests
+buildName: Visual Tests
+# buildName: Functional Tests
 # `buildIdentifier` is a unique id to differentiate every execution that gets appended to
 # buildName. Choose your buildIdentifier format from the available expressions:
 # ${BUILD_NUMBER} (Default): Generates an incremental counter with every execution
 # ${DATE_TIME}: Generates a Timestamp with every execution. Eg. 05-Nov-19:30
 # Read more about buildIdentifiers here -> https://www.browserstack.com/docs/automate/selenium/organize-tests
 buildIdentifier: "#${BUILD_NUMBER}" # Supports strings along with either/both ${expression}
-buildTag: "regresson"
+buildTag: "a11y"
 selfHeal: true
 # =======================================
 # Platforms (Browsers / Devices to test)
@@ -42,6 +43,7 @@ platforms:
   - deviceName: iPhone 1*
     browserName: safari
     osVersion: [15161718]
+
 # =======================
 # Parallels per Platform
 # =======================
@@ -92,7 +94,7 @@ accessibilityOptions:
   #excludeTagsInTestingScope: [ 'old', 'deprecated' ] # Tags for test cases to exclude
 
 performance: false
-percy: false
+percy: true
 percyCaptureMode: auto
 #logLevel: debug
 browserstackAutomation: true

@@ -28,7 +28,7 @@ public class CartSteps {
         bshome.addToCartNTimes(deviceName, clicks);
     }
 
-    @Then("The Cart gets updated with {string} and {int}")
+    @Then("The cart gets updated with {string} and {int}")
     public void cart_is_updated(String deviceName, int quantity) {
         sc.log("Starting cart verification");
         System.out.println("Starting cart verification");
