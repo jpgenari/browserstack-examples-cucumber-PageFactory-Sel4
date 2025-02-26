@@ -98,3 +98,5 @@ percy: true
 percyCaptureMode: auto
 #logLevel: debug
 browserstackAutomation: true
+
+# To run with this config - mvn test -P scenario-onprem -Dbrowserstack.config="browserstack-percy.yml"
