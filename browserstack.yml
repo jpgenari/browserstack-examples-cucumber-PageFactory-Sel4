@@ -11,7 +11,7 @@ accessKey: YOUR_ACCESS_KEY
 # ======================
 # The following capabilities are used to set up reporting on BrowserStack:
 # Set 'projectName' to the name of your project. Example, Marketing Website
-projectName: BrowserStack Sample # Automate - Map SDK
+projectName: BrowserStack Cucumber TestNG # Automate - Map SDK
 # Set `buildName` as the name of the job / testsuite being run
 buildName: browserstack build
 # `buildIdentifier` is a unique id to differentiate every execution that gets appended to
@@ -32,6 +32,7 @@ platforms:
     osVersion: Big Sur
     browserName: Chrome
     browserVersion: latest
+    accessibility: true
   - os: Windows
     osVersion: 10
     browserName: Edge
@@ -39,7 +40,7 @@ platforms:
   - deviceName: Samsung Galaxy S2*
     browserName: chrome # Try 'samsung' for Samsung browser
     osVersion: [12131415]
-  - deviceName: iPhone 1* 
+  - deviceName: iPhone 1*
     browserName: safari
     osVersion: [15161718]
 # =======================
