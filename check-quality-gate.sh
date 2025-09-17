@@ -1,14 +1,14 @@
 #!/bin/bash
 # Update values here
 project_name="BrowserStack Cucumber TestNG"  # Replace with your project name
-build_name="$BROWSERSTACK_BUILD_NAME"  # Replace with your build name use $BROWSERSTACK_BUILD_NAME if you use the BrowserStack Jenkins Plugin
+build_name="azure-BrowserStack_Platform_SDK-CI-355" # "$BROWSERSTACK_BUILD_NAME"  # Replace with your build name use $BROWSERSTACK_BUILD_NAME if you use the BrowserStack Jenkins Plugin
 
 # Read secrets from environment variables
 username="$BROWSERSTACK_USERNAME" 
 access_key="$BROWSERSTACK_ACCESS_KEY" 
 
 max_attempts=20 # Replace with your max retry attempt
-build_tags="{Insert Value Here}" # Optional - Replace with custom build tags if any
+build_tags="" # Optional - Replace with custom build tags if any
 # Script Functions - REFRAIN FROM MODIFYING THE SCRIPT BELOW 
 # Function to sanitize project and build names
 sanitize_name() {
@@ -27,8 +27,10 @@ if [ -n "$sanitized_build_tags" ]; then
 else
   response=$(curl -s --retry 3 --connect-timeout 10 -u "$username:$access_key" "https://api-automation.browserstack.com/ext/v1/builds/latest?project_name=$sanitized_project_name&build_name=$sanitized_build_name&user_name=$username")
 fi
-response=$(echo "$response" | perl -pe 's/([[:cntrl:]])/sprintf("\\x{%02X}", ord($1))/eg')
-local build_uuid=$(echo "$response" | jq -r '.build_id')
+# Use perl to strip ALL non-printable control characters that can break jq.
+# This is a more robust fix than just replacing \n and \t.
+local sanitized_response=$(echo "$response" | perl -pe 's/[^[:print:]]//g')
+local build_uuid=$(echo "$sanitized_response" | jq -r '.build_id')
 echo "$build_uuid"
 }
 # Function to hit Quality Gates API and get the result
