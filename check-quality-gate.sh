@@ -70,6 +70,6 @@ fi
 # Quality Gates API Poll
 build_uuid=\$(get_latest_build_uuid)
 sleep 20
-quality_gate_result=\$(poll_quality_gate_api)
-echo "Quality Gate Result: \$quality_gate_result"
+quality_gate_result=$(poll_quality_gate_api)
+echo "Quality Gate Result: $quality_gate_result"
 assert_quality_gate_result
