@@ -1,7 +1,7 @@
 #!/bin/bash
 # Update values here
 project_name="BrowserStack Cucumber TestNG"
-build_name="$BROWSERSTACK_BUILD_NAME"
+build_name="azure-BrowserStack_Platform_SDK-CI-355"
 
 # Read secrets from environment variables
 username="$BROWSERSTACK_USERNAME"
