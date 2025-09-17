@@ -1,91 +1,99 @@
 #!/bin/bash
-# Update values here
-project_name="BrowserStack Cucumber TestNG"
-build_name="azure-BrowserStack_Platform_SDK-CI-355"
+set -e # Exit immediately if a command exits with a non-zero status.
 
-# Read secrets from environment variables
+# --- Configuration ---
+# These values are read from Azure DevOps Pipeline variables.
+project_name="BrowserStack Cucumber TestNG"
+build_name="$BROWSERSTACK_BUILD_NAME"
 username="$BROWSERSTACK_USERNAME"
 access_key="$BROWSERSTACK_ACCESS_KEY"
 
-max_attempts=20
-build_tags=""
+# --- Script Parameters ---
+max_attempts=20 # Max number of times to poll the API (20 attempts * 30s = 10 minutes)
+build_tags=""   # Optional: Set build tags if needed
 
-# --- Print initial config to stderr ---
-echo "[DEBUG] --- Initial Configuration ---" >&2
-echo "[DEBUG] Project Name: $project_name" >&2
-echo "[DEBUG] Build Name (from env): $build_name" >&2
-echo "[DEBUG] Username: $username" >&2
-echo "[DEBUG] Build Tags: $build_tags" >&2
-echo "[DEBUG] ---------------------------" >&2
+# --- Script Functions ---
 
-# Script Functions
+# Function to URL-encode a string
 sanitize_name() {
     local name="$1"
     echo "$name" | sed 's/ /%20/g'
 }
 
+# Function to get the UUID of the latest build
 get_latest_build_uuid() {
-    local sanitized_project_name=$(sanitize_name "$project_name")
-    local sanitized_build_name=$(sanitize_name "$build_name")
+    local sanitized_project_name
+    local sanitized_build_name
+    sanitized_project_name=$(sanitize_name "$project_name")
+    sanitized_build_name=$(sanitize_name "$build_name")
 
-    echo "[DEBUG] Sanitized Project Name: $sanitized_project_name" >&2
-    echo "[DEBUG] Sanitized Build Name: $sanitized_build_name" >&2
-
-    # REMOVED user_name parameter for a more reliable query
+    # API call relies on project and build name, which is most reliable in CI.
     local url="https://api-automation.browserstack.com/ext/v1/builds/latest?project_name=$sanitized_project_name&build_name=$sanitized_build_name"
-    echo "[DEBUG] Querying URL: $url" >&2
     
-    # Fetch the JSON response. This goes to stdout.
+    # Add optional build tags to the query if they are set
+    if [ -n "$build_tags" ]; then
+        local sanitized_build_tags
+        sanitized_build_tags=$(sanitize_name "$build_tags")
+        url="$url&build_tags=$sanitized_build_tags"
+    fi
+    
+    echo "Querying for build..." >&2
+    
+    # Fetch the JSON response. This goes to standard output.
     curl -s --retry 3 --connect-timeout 10 -u "$username:$access_key" "$url"
 }
 
+# Function to get the status of the Quality Gate for a given build UUID
 get_quality_gate_result() {
-    echo "[DEBUG] Checking Quality Gate for Build UUID: $build_uuid" >&2
+    local build_uuid="$1"
     local qg_url="https://api-automation.browserstack.com/ext/v1/quality-gates/$build_uuid"
-    echo "[DEBUG] Querying Quality Gate URL: $qg_url" >&2
     
-    # Fetch the JSON response. This goes to stdout.
+    # Fetch the JSON response. This goes to standard output.
     curl -s -H --retry 3 --connect-timeout 10 -u "$username:$access_key" "$qg_url"
 }
 
 # --- Main Script Execution ---
-build_uuid_json=$(get_latest_build_uuid)
-echo "[DEBUG] Raw API Response for Build UUID: $build_uuid_json" >&2
 
-sanitized_response=$(echo "$build_uuid_json" | perl -pe 's/[^[:print:]\n]//g')
-build_uuid=$(echo "$sanitized_response" | jq -r '.build_id')
-echo "[DEBUG] Extracted Build UUID: $build_uuid" >&2
+echo "--- BrowserStack Quality Gate Check ---" >&2
+
+build_info_json=$(get_latest_build_uuid)
+build_uuid=$(echo "$build_info_json" | jq -r '.build_id')
 
 if [ "$build_uuid" == "null" ] || [ -z "$build_uuid" ]; then
-    echo "[ERROR] Failed to retrieve a valid Build UUID. Check API response above." >&2
+    echo "Error: Failed to retrieve a valid Build UUID from the API." >&2
+    echo "API Response: $build_info_json" >&2
     exit 1
 fi
 
+echo "Successfully found Build UUID: $build_uuid" >&2
+echo "Waiting 20 seconds before polling Quality Gate..." >&2
 sleep 20
 
 # Polling loop
 attempt=0
 while [[ $attempt -lt $max_attempts ]]; do
-    echo "[DEBUG] Polling attempt #$((attempt + 1))..." >&2
-    quality_gate_result_json=$(get_quality_gate_result)
-    echo "[DEBUG] Raw Quality Gate Response: $quality_gate_result_json" >&2
+    attempt=$((attempt + 1))
+    echo "Polling attempt #$attempt..." >&2
     
-    result=$(echo "$quality_gate_result_json" | jq -r '.status')
-    echo "[DEBUG] Current status is: '$result'" >&2
+    quality_gate_json=$(get_quality_gate_result "$build_uuid")
+    status=$(echo "$quality_gate_json" | jq -r '.status')
     
-    if [ "$result" != "running" ]; then
-        break
+    echo "Current status is: '$status'" >&2
+    
+    if [ "$status" != "running" ]; then
+        echo "Final Quality Gate Result: $quality_gate_json"
+        
+        if [ "$status" == "passed" ]; then
+            echo "✅ Quality Gate Passed" >&2
+            exit 0
+        else
+            echo "❌ Quality Gate Failed" >&2
+            exit 1
+        fi
     fi
+    
     sleep 30
-    ((attempt++))
 done
 
-echo "Final Quality Gate Result: $quality_gate_result_json"
-
-if [ "$result" == "passed" ]; then
-    echo "Quality Gate passed" >&2
-    exit 0
-else
-    echo "Quality Gate failed" >&2
-    exit 1
-fi
+echo "Error: Timed out waiting for Quality Gate results after $max_attempts attempts." >&2
+exit 1
