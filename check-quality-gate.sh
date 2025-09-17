@@ -68,7 +68,7 @@ exit 1
 fi
 }
 # Quality Gates API Poll
-build_uuid=\$(get_latest_build_uuid)
+build_uuid=$(get_latest_build_uuid)
 sleep 20
 quality_gate_result=$(poll_quality_gate_api)
 echo "Quality Gate Result: $quality_gate_result"
