@@ -95,3 +95,13 @@ performance: assert
 percy: true
 percyCaptureMode: auto
 #logLevel: debug
+browserProfiling: true
+
+testOrchestrationOptions:
+  retryTestsOnFailure:
+    enabled: true
+    maxRetries: 2
+  runSmartSelection:
+    enabled: true
+    mode: relevantFirst
+  runPreviouslyFailedFirst: true
