@@ -38,10 +38,10 @@ platforms:
     browserVersion: 131.0
   - deviceName: Samsung Galaxy S2*
     browserName: chrome # Try 'samsung' for Samsung browser
-    osVersion: [12131415]
+    osVersion: "[12131415]"
   - deviceName: iPhone 1* 
     browserName: safari
-    osVersion: [15161718]
+    osVersion: "[15161718]"
 # =======================
 # Parallels per Platform
 # =======================
@@ -51,7 +51,7 @@ platforms:
 # Example 1 - If you have configured 3 platforms and set `parallelsPerPlatform` as 2, a total of 6 (2 * 3) parallel threads will be used on BrowserStack
 #
 # Example 2 - If you have configured 1 platform and set `parallelsPerPlatform` as 5, a total of 5 (1 * 5) parallel threads will be used on BrowserStack
-parallelsPerPlatform: 2
+parallelsPerPlatform: 4
 framework: cucumber-testng #junit,testng,java,cucumber-testng,serenity,cucumber-junit
 source: cucumber-testng:intellij:v1.1.2
 staticWebDriver: true
