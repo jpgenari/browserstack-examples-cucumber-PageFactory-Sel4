@@ -1,15 +1,11 @@
 name: BrowserStack Accessibility Tests (On-Prem)
 
 on:
-  # Manual trigger only
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
-    # Ensure this only runs for the sdk branch
-    if: github.ref == 'refs/heads/sdk'
 
     steps:
       - name: Checkout sdk branch
